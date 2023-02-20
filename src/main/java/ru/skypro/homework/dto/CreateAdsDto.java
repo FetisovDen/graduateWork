@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class CreateAdsDto {
-    String description;
-    Integer price;
-    String title;
+    private String description;
+    private Integer price;
+    private String title;
 }

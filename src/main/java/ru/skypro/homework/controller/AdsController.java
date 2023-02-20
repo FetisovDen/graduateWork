@@ -17,7 +17,7 @@ public class AdsController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<AdsDto> addAds(@RequestBody CreateAdsDto adsDto, @RequestBody MultipartFile multipartFile) {
+    public ResponseEntity<AdsDto> addAds(@RequestPart CreateAdsDto adsDto, @RequestPart MultipartFile multipartFile) {
         return null;
     }
 

@@ -7,6 +7,6 @@ public class AdsDto {
     private Integer pk;
     private String title;
     private Integer price;
-    private String[] image;
+    private String image;
     private String description;
 }
