@@ -32,6 +32,20 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    public User(Integer id, String firstName, String lastName, String email, String phone, String city, Timestamp regDate, String userName, String password, Avatar avatar, Role role) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.phone = phone;
+        this.city = city;
+        this.regDate = regDate;
+        this.userName = userName;
+        this.password = password;
+        this.avatar = avatar;
+        this.role = role;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
