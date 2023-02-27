@@ -4,34 +4,34 @@ import lombok.*;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 import java.util.Objects;
 
+@Entity
 @Getter
 @Setter
 @ToString
 @RequiredArgsConstructor
-@Entity
-@Table(name = "comment")
-public class Comment {
+@Table(name = "ads")
+public class Ads {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "id_user")
     private User user;
     @OneToOne
-    @JoinColumn(name = "id_ads")
-    private Ads ads;
-    private String text;
-    private Timestamp createdAt;
+    @JoinColumn(name = "id_image")
+    private Image image;
+    private Integer price;
+    private String title;
+    private String description;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Comment comment = (Comment) o;
-        return id != null && Objects.equals(id, comment.id);
+        Ads ads = (Ads) o;
+        return id != null && Objects.equals(id, ads.id);
     }
 
     @Override
