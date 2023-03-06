@@ -1,14 +1,28 @@
 package ru.skypro.homework.mapper;
 
+import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
+import org.mapstruct.Mapping;
+import org.springframework.stereotype.Component;
 import ru.skypro.homework.dto.CommentDto;
 import ru.skypro.homework.entity.Comment;
 
-@Mapper
-public interface CommentMapper {
-    CommentMapper INSTANCE = Mappers.getMapper(CommentMapper.class);
-    CommentDto toDTO(Comment comment);
+import java.sql.Timestamp;
 
-    Comment toEntity(CommentDto dto);
+@Mapper(componentModel = "spring", uses = {CommentDtoToEntity.class})
+public interface CommentMapper {
+    @Mapping(target = "pk", source = "id")
+    @Mapping(target = "author", expression = "java(comment.getUser().getId())")
+    @Mapping(target = "createdAt", source = "createdAt", dateFormat = "yyyy-MM-dd HH:mm")
+    CommentDto commentToDTO(Comment comment);
+
+    @InheritInverseConfiguration
+    @Mapping(target = "createdAt", source = "createdAt")
+    Comment commentDtoToEntity(CommentDto commentDto);
+}
+@Component
+class CommentDtoToEntity {
+    Timestamp mapStringToTimestamp(String string) {
+        return Timestamp.valueOf(string);
+    }
 }
