@@ -3,34 +3,32 @@ package ru.skypro.homework.service.impl;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.NewPasswordDto;
-import ru.skypro.homework.dto.Role;
 import ru.skypro.homework.dto.UserDto;
-import ru.skypro.homework.entity.Avatar;
 import ru.skypro.homework.entity.User;
+import ru.skypro.homework.exception.PasswordMismatchException;
 import ru.skypro.homework.exception.UserNotFoundException;
 import ru.skypro.homework.mapper.UserMapper;
 import ru.skypro.homework.repository.UserRepository;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-
 @Service
-public class UserServiceImpl {
+public class UserService {
     private final UserRepository userRepository;
-    private final AvatarServiceImpl avatarServiceImpl;
+    private final AvatarService avatarService;
     private final UserMapper userMapper;
 
-    public UserServiceImpl(UserRepository userRepository, AvatarServiceImpl avatarServiceImpl, UserMapper userMapper) {
+    public UserService(UserRepository userRepository, AvatarService avatarService, UserMapper userMapper) {
         this.userRepository = userRepository;
-        this.avatarServiceImpl = avatarServiceImpl;
+        this.avatarService = avatarService;
         this.userMapper = userMapper;
     }
 
-    public NewPasswordDto setPassword(NewPasswordDto newPasswordDto) {
-        User user = new User(1, "1", "1", "1", "1", "1", Timestamp.valueOf(LocalDateTime.now()), "user@gmail.com", "password", new Avatar(), Role.USER);
+    public NewPasswordDto setPassword(int id, NewPasswordDto newPasswordDto) throws PasswordMismatchException {
+        User user = getUser(id);
         if (user.getPassword().equals(newPasswordDto.getCurrentPassword())) {
             user.setPassword(newPasswordDto.getNewPassword());
             userRepository.save(user);
+        } else {
+            throw new PasswordMismatchException();
         }
         return newPasswordDto;
     }
@@ -50,8 +48,9 @@ public class UserServiceImpl {
         return userMapper.toDTO(user);
     }
 
-    public void updateUserImage(int id, MultipartFile avatar) {
-        User user = getUser(id);
-        avatarServiceImpl.updateAvatar(user, avatar);
+    public void updateUserImage(int id, MultipartFile file) {
+        User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+        user.setAvatar(avatarService.updateAvatar(user, file));
+        userRepository.save(user);
     }
 }

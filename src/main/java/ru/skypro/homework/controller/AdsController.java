@@ -1,22 +1,19 @@
 package ru.skypro.homework.controller;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.*;
-import ru.skypro.homework.service.impl.AdsServiceImpl;
-import ru.skypro.homework.service.impl.CommentServiceImpl;
-import ru.skypro.homework.service.impl.ImageServiceImpl;
+import ru.skypro.homework.service.impl.AdsService;
 
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
 @RequestMapping("/ads")
 public class AdsController {
-    private final AdsServiceImpl adsService;
+    private final AdsService adsService;
 
-    public AdsController(AdsServiceImpl adsService) {
+    public AdsController(AdsService adsService) {
         this.adsService = adsService;
     }
 
@@ -33,7 +30,7 @@ public class AdsController {
 
     @GetMapping( "/{ad_pk}/comments")
     public ResponseEntity <ResponseWrapperCommentDto> getComments(@PathVariable("ad_pk") int adPk) {
-        return ResponseEntity.ok(adsService.getAllCommentsById(adPk));
+        return ResponseEntity.ok(adsService.getAllCommentsByAdsId(adPk));
     }
 
     @PostMapping("/{ad_pk}/comments")
@@ -58,13 +55,13 @@ public class AdsController {
 
     @GetMapping("/{ad_pk}/comments/{id}")
     public ResponseEntity<CommentDto> getComments(@PathVariable("ad_pk") int adPk, @PathVariable int id) {
-        return ResponseEntity.ok(adsService.getComments(adPk,id));
+        return ResponseEntity.ok(adsService.getCommentOfAds(adPk,id));
     }
 
     @DeleteMapping("/{ad_pk}/comments/{id}")
     public ResponseEntity<CommentDto>deleteComments(@PathVariable("ad_pk") int adPk, @PathVariable int id) {
 //        add BadRequest
-        return ResponseEntity.ok(adsService.deleteComments(adPk,id));
+        return ResponseEntity.ok(adsService.deleteCommentOfAds(adPk,id));
     }
 
     @PatchMapping("/{ad_pk}/comments/{id}")

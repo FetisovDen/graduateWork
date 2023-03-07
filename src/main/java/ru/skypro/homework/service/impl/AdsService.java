@@ -6,6 +6,7 @@ import ru.skypro.homework.dto.*;
 import ru.skypro.homework.entity.Ads;
 import ru.skypro.homework.entity.Avatar;
 import ru.skypro.homework.entity.User;
+import ru.skypro.homework.exception.AdsNotFoundException;
 import ru.skypro.homework.mapper.AdsMapper;
 import ru.skypro.homework.repository.AdsRepository;
 
@@ -15,17 +16,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class AdsServiceImpl {
+public class AdsService {
     private final AdsRepository adsRepository;
-    private final CommentServiceImpl commentServiceImpl;
+    private final CommentService commentService;
     private final AdsMapper adsMapper;
-    private final ImageServiceImpl imageServiceImpl;
+    private final ImageService imageService;
 
-    public AdsServiceImpl(AdsRepository adsRepository, CommentServiceImpl commentServiceImpl, AdsMapper adsMapper, ImageServiceImpl imageServiceImpl) {
+    public AdsService(AdsRepository adsRepository, CommentService commentService, AdsMapper adsMapper, ImageService imageService) {
         this.adsRepository = adsRepository;
-        this.commentServiceImpl = commentServiceImpl;
+        this.commentService = commentService;
         this.adsMapper = adsMapper;
-        this.imageServiceImpl = imageServiceImpl;
+        this.imageService = imageService;
     }
 
 
@@ -52,32 +53,42 @@ public class AdsServiceImpl {
                 , new Avatar(),
                 Role.USER));
         ads = adsRepository.save(ads);
-        ads.setImage(imageServiceImpl.addImage(ads, multipartFile));
+        ads.setImage(imageService.addImage(ads, multipartFile));
         ads = adsRepository.save(ads);
         return adsMapper.adsToDTO(ads);
     }
 
-    public ResponseWrapperCommentDto getAllCommentsById(int adPk) {
-        return commentServiceImpl.getAllCommentsById(adPk);
+    public ResponseWrapperCommentDto getAllCommentsByAdsId(int adPk) {
+        Ads ads = adsRepository.findById(adPk).orElseThrow(AdsNotFoundException::new);
+        return commentService.getAllCommentsByAds(ads);
     }
 
     public CommentDto addComments(int adPk, CommentDto commentDto) {
-        return commentServiceImpl.addComments(adPk, commentDto);
+        if (adPk < 0 || commentDto == null) {
+            throw new IllegalArgumentException();
+        }
+        Ads ads = adsRepository.findById(adPk).orElseThrow(AdsNotFoundException::new);
+        return commentService.addComments(ads, commentDto);
     }
 
+
     public FullAdsDto getFullAds(int id) {
-        Ads ads = adsRepository.findAdsById(id);
+        if (id < 0) {
+            throw new IllegalArgumentException();
+        }
+        Ads ads = adsRepository.findById(id).orElseThrow(AdsNotFoundException::new);
+
         return adsMapper.adsToFullAdsDTO(ads);
     }
 
     public FullAdsDto deleteAds(int id) {
-        Ads ads = adsRepository.findAdsById(id);
+        Ads ads = adsRepository.findById(id).orElseThrow(AdsNotFoundException::new);
         adsRepository.deleteById(id);
         return adsMapper.adsToFullAdsDTO(ads);
     }
 
     public AdsDto updateAds(int id, CreateAdsDto createAdsDto) {
-        Ads ads = adsRepository.findAdsById(id);
+        Ads ads = adsRepository.findById(id).orElseThrow(AdsNotFoundException::new);
         ads.setDescription(createAdsDto.getDescription());
         ads.setPrice(createAdsDto.getPrice());
         ads.setTitle(createAdsDto.getTitle());
@@ -85,19 +96,19 @@ public class AdsServiceImpl {
         return adsMapper.adsToDTO(ads);
     }
 
-    public CommentDto getComments(int adPk, int id) {
-        Ads ads = adsRepository.findAdsById(adPk);
-        return commentServiceImpl.getComments(ads, id);
+    public CommentDto getCommentOfAds(int adPk, int id) {
+        Ads ads = adsRepository.findById(adPk).orElseThrow(AdsNotFoundException::new);
+        return commentService.getCommentOfAds(ads, id);
     }
 
-    public CommentDto deleteComments(int adPk, int id) {
-        Ads ads = adsRepository.findAdsById(adPk);
-        return commentServiceImpl.deleteComments(ads, id);
+    public CommentDto deleteCommentOfAds(int adPk, int id) {
+        Ads ads = adsRepository.findById(adPk).orElseThrow(AdsNotFoundException::new);
+        return commentService.deleteCommentOfAds(ads, id);
     }
 
     public CommentDto updateComments(int adPk, int id, CommentDto commentDto) {
-        Ads ads = adsRepository.findAdsById(adPk);
-        return commentServiceImpl.updateComments(ads, id, commentDto);
+        Ads ads = adsRepository.findById(adPk).orElseThrow(AdsNotFoundException::new);
+        return commentService.updateComments(ads, id, commentDto);
     }
 
     public ResponseWrapperAdsDto getAdsMe() {
