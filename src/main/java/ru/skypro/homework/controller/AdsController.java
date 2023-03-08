@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.*;
-import ru.skypro.homework.service.impl.AdsService;
+import ru.skypro.homework.service.AdsService;
 
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
@@ -24,8 +24,8 @@ public class AdsController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<AdsDto> addAds(@RequestPart CreateAdsDto createAdsDto, @RequestPart MultipartFile multipartFile) {
-        return ResponseEntity.ok(adsService.addAds(createAdsDto, multipartFile));
+    public ResponseEntity<AdsDto> addAds(@RequestPart CreateAdsDto properties, @RequestPart MultipartFile image) {
+        return ResponseEntity.ok(adsService.addAds(properties, image));
     }
 
     @GetMapping( "/{ad_pk}/comments")

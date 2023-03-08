@@ -1,4 +1,4 @@
-package ru.skypro.homework.service.impl;
+package ru.skypro.homework.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -8,9 +8,9 @@ import ru.skypro.homework.entity.Avatar;
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.exception.AdsNotFoundException;
 import ru.skypro.homework.mapper.AdsMapper;
+import ru.skypro.homework.mapper.UserMapper;
 import ru.skypro.homework.repository.AdsRepository;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,13 +20,17 @@ public class AdsService {
     private final AdsRepository adsRepository;
     private final CommentService commentService;
     private final AdsMapper adsMapper;
+    private final UserMapper userMapper;
     private final ImageService imageService;
+    private final UserService userService;
 
-    public AdsService(AdsRepository adsRepository, CommentService commentService, AdsMapper adsMapper, ImageService imageService) {
+    public AdsService(AdsRepository adsRepository, CommentService commentService, AdsMapper adsMapper, UserMapper userMapper, ImageService imageService, UserService userService) {
         this.adsRepository = adsRepository;
         this.commentService = commentService;
         this.adsMapper = adsMapper;
+        this.userMapper = userMapper;
         this.imageService = imageService;
+        this.userService = userService;
     }
 
 
@@ -46,14 +50,14 @@ public class AdsService {
                 "1",
                 "1",
                 "1",
-                "1"
-                , Timestamp.valueOf(LocalDateTime.now()),
+                "1",
+                LocalDateTime.now(),
                 "user@gmail.com",
                 "password"
-                , new Avatar(),
+                , new Avatar(1,null),
                 Role.USER));
-        ads = adsRepository.save(ads);
         ads.setImage(imageService.addImage(ads, multipartFile));
+        userService.updateUser(userMapper.toDTO(ads.getUser()));
         ads = adsRepository.save(ads);
         return adsMapper.adsToDTO(ads);
     }

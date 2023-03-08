@@ -1,4 +1,4 @@
-package ru.skypro.homework.service.impl;
+package ru.skypro.homework.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ public class ImageService {
     private final AdsRepository adsRepository;
     private final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public ImageService(@Value("${path.to.files.folder}image") String imageDir, ImageRepository imageRepository,
+    public ImageService(@Value("${path.to.images.folder}.") String imageDir, ImageRepository imageRepository,
                         AdsRepository adsRepository) {
         this.imageDir = imageDir;
         this.imageRepository = imageRepository;
@@ -33,7 +33,8 @@ public class ImageService {
     public Image addImage(Ads ads, MultipartFile multipartFile) {
         try {
             byte[] img = multipartFile.getBytes();
-            Path path = Path.of(imageDir, ads.getId() + "_" + LocalDateTime.now().format(format) + ".jpg");
+            Path path = Path.of(imageDir, ads.getDescription()+ LocalDateTime.now().format(format) + ".jpg");
+            Files.createDirectories(path.getParent());
             Files.write(path, img);
             Image image = new Image();
             image.setPathImage(path.toString());
@@ -44,9 +45,9 @@ public class ImageService {
         }
     }
 
-    public byte[] updateImage(int idAds, MultipartFile image) {
-        Ads ads = adsRepository.findById(idAds).orElseThrow(AdsNotFoundException::new);
-        Image oldImage = imageRepository.findByAdsId(idAds);
+    public byte[] updateImage(int id, MultipartFile image) {
+        Ads ads = adsRepository.findById(id).orElseThrow(AdsNotFoundException::new);
+        Image oldImage = ads.getImage();
         imageRepository.delete(oldImage);
         addImage(ads, image);
         try {

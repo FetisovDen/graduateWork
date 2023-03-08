@@ -4,7 +4,7 @@ import lombok.*;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Getter
@@ -24,7 +24,7 @@ public class Comment {
     @JoinColumn(name = "id_ads")
     private Ads ads;
     private String text;
-    private Timestamp createdAt;
+    private LocalDateTime createdAt;
 
     @Override
     public boolean equals(Object o) {

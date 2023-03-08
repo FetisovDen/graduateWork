@@ -18,6 +18,11 @@ public class Avatar {
     private Integer id;
     private String pathAvatar;
 
+    public Avatar(Integer id, String pathAvatar) {
+        this.id = id;
+        this.pathAvatar = pathAvatar;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

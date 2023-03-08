@@ -15,7 +15,7 @@ CREATE TABLE image
 CREATE TABLE avatar
 (
     id          INTEGER PRIMARY KEY generated always as identity,
-    path_avatar TEXT NOT NULL
+    path_avatar TEXT
 );
 
 --changeset dfetisov:3
@@ -32,7 +32,7 @@ CREATE TABLE users
     reg_date   TIMESTAMP NOT NULL,
     user_name  TEXT      NOT NULL,
     password   TEXT      NOT NULL,
-    id_avatar  INTEGER   NOT NULL REFERENCES avatar (id),
+    id_avatar  INTEGER   REFERENCES avatar (id),
     role       TEXT      NOT NULL
 );
 

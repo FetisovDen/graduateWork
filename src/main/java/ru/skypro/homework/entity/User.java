@@ -5,7 +5,7 @@ import org.hibernate.Hibernate;
 import ru.skypro.homework.dto.Role;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -23,7 +23,7 @@ public class User {
     private String email;
     private String phone;
     private String city;
-    private Timestamp regDate;
+    private LocalDateTime regDate;
     private String userName;
     private String password;
     @OneToOne
@@ -32,7 +32,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    public User(Integer id, String firstName, String lastName, String email, String phone, String city, Timestamp regDate, String userName, String password, Avatar avatar, Role role) {
+    public User(Integer id, String firstName, String lastName, String email, String phone, String city, LocalDateTime regDate, String userName, String password, Avatar avatar, Role role) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;

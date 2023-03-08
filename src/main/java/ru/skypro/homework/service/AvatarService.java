@@ -1,4 +1,4 @@
-package ru.skypro.homework.service.impl;
+package ru.skypro.homework.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,7 @@ public class AvatarService {
     private final String avatarDir;
     private final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public AvatarService(@Value("${path.to.files.folder}avatar") String avatarDir, AvatarRepository avatarRepository) {
+    public AvatarService(@Value("./images/avatar") String avatarDir, AvatarRepository avatarRepository) {
         this.avatarRepository = avatarRepository;
         this.avatarDir = avatarDir;
     }
