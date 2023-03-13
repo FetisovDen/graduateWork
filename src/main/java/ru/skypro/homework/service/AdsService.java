@@ -43,21 +43,12 @@ public class AdsService {
         return new ResponseWrapperAdsDto(listAdsDto.size(), listAdsDto);
     }
 
-    public AdsDto addAds(CreateAdsDto createAdsDto, MultipartFile multipartFile) {
+    public AdsDto addAds(String userName, CreateAdsDto createAdsDto, MultipartFile multipartFile) {
         Ads ads = adsMapper.adsToEntity(createAdsDto);
-        ads.setUser(new User(1,
-                "1",
-                "1",
-                "1",
-                "1",
-                "1",
-                LocalDateTime.now(),
-                "user@gmail.com",
-                "password"
-                , new Avatar(1,null),
-                Role.USER));
+        User user = userMapper.toEntity(userService.getUserDto(userName));
+        ads.setUser(user);
         ads.setImage(imageService.addImage(ads, multipartFile));
-        userService.updateUser(userMapper.toDTO(ads.getUser()));
+        userService.updateUser(userName, userMapper.toDTO(ads.getUser()));
         ads = adsRepository.save(ads);
         return adsMapper.adsToDTO(ads);
     }
@@ -115,8 +106,9 @@ public class AdsService {
         return commentService.updateComments(ads, id, commentDto);
     }
 
-    public ResponseWrapperAdsDto getAdsMe() {
-        List<Ads> listAds = adsRepository.findAll(); // findByUser(user)
+    public ResponseWrapperAdsDto getAdsMe(String userName) {
+        User user = userMapper.toEntity(userService.getUserDto(userName));
+        List<Ads> listAds = adsRepository.findAllByUser(user);
         List<AdsDto> listAdsDto = new ArrayList<>();
         for (Ads listAd : listAds) {
             listAdsDto.add(adsMapper.adsToDTO(listAd));

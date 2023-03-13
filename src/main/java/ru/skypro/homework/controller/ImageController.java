@@ -2,11 +2,13 @@ package ru.skypro.homework.controller;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.service.ImageService;
 
 @CrossOrigin(value = "http://localhost:3000")
+@PreAuthorize("hasRole('USER')")
 @RestController
 @RequestMapping("/image")
 public class ImageController {

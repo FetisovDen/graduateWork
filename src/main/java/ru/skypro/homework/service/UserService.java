@@ -6,7 +6,9 @@ import ru.skypro.homework.dto.NewPasswordDto;
 import ru.skypro.homework.dto.Role;
 import ru.skypro.homework.dto.UserDto;
 import ru.skypro.homework.entity.Avatar;
+import ru.skypro.homework.entity.Comment;
 import ru.skypro.homework.entity.User;
+import ru.skypro.homework.exception.CommentNotFoundException;
 import ru.skypro.homework.exception.PasswordMismatchException;
 import ru.skypro.homework.exception.UserNotFoundException;
 import ru.skypro.homework.mapper.UserMapper;
@@ -27,8 +29,8 @@ public class UserService {
         this.userMapper = userMapper;
     }
 
-    public NewPasswordDto setPassword(int id, NewPasswordDto newPasswordDto) throws PasswordMismatchException {
-        User user = getUser(id);
+    public NewPasswordDto setPassword(String name, NewPasswordDto newPasswordDto) throws PasswordMismatchException {
+        User user = getUser(name);
         if (user.getPassword().equals(newPasswordDto.getCurrentPassword())) {
             user.setPassword(newPasswordDto.getNewPassword());
             userRepository.save(user);
@@ -38,36 +40,42 @@ public class UserService {
         return newPasswordDto;
     }
 
-    private User getUser(int userId) {
-        return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+    private User getUser(String userName) {
+        User user = userRepository.findByUserName(userName);
+        checkUser(user);
+        return user;
     }
-    public UserDto getUserDto(int userId) {
-        return userMapper.toDTO(getUser(userId));
+    public UserDto getUserDto(String userName) {
+        return userMapper.toDTO(getUser(userName));
     }
-    public UserDto updateUser(UserDto userDto) {
-        User user1 = new User(1,
-                "1",
-                "1",
-                "1",
-                "1",
-                "1",
-                LocalDateTime.now(),
-                "user@gmail.com",
-                "password"
-                , new Avatar(1,null),
-                Role.USER);
-        user1.setFirstName(userDto.getFirstName());
-        user1.setLastName(userDto.getLastName());
-        user1.setPhone(userDto.getPhone());
-        System.out.println("1");
-        userRepository.save(user1);
-        System.out.println(user1);
-        return userMapper.toDTO(user1);
+    public UserDto updateUser(String userName, UserDto body) {
+        User oldUser = getUser(userName);
+        User newUser = userMapper.toEntity(body);
+        if (newUser.getEmail() != null) {
+            oldUser.setEmail(newUser.getEmail());
+        }
+        if (newUser.getPhone() != null) {
+            oldUser.setPhone(newUser.getPhone());
+        }
+        if (newUser.getFirstName() != null) {
+            oldUser.setFirstName(newUser.getFirstName());
+        }
+        if (newUser.getLastName() != null) {
+            oldUser.setLastName(newUser.getLastName());
+        }
+        oldUser = userRepository.save(oldUser);
+        return userMapper.toDTO(oldUser);
     }
 
-    public void updateUserImage(int id, MultipartFile file) {
-        User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+    public void updateUserImage(String userName, MultipartFile file) {
+        User user = userRepository.findByUserName(userName);
+        checkUser(user);
         user.setAvatar(avatarService.updateAvatar(user, file));
         userRepository.save(user);
+    }
+    private void checkUser(User user ) {
+        if (user == null) {
+            throw new UserNotFoundException();
+        }
     }
 }

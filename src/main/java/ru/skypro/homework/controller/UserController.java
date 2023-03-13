@@ -3,13 +3,17 @@ package ru.skypro.homework.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.NewPasswordDto;
 import ru.skypro.homework.dto.UserDto;
 import ru.skypro.homework.service.UserService;
+import org.springframework.security.core.Authentication;
+
 
 @Slf4j
+@PreAuthorize("hasRole('USER')")
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
 @RequestMapping("/users")
@@ -22,27 +26,27 @@ public class UserController {
     }
 
 
-    @PostMapping("/{id}/set_password")
-    public ResponseEntity<NewPasswordDto> setPassword(@PathVariable int id, @RequestBody NewPasswordDto newPasswordDto) {
-        return ResponseEntity.ok(userService.setPassword(id, newPasswordDto));
+    @PostMapping("/set_password")
+    public ResponseEntity<NewPasswordDto> setPassword(Authentication authentication,
+                                                      @RequestBody NewPasswordDto newPasswordDto) {
+        return ResponseEntity.ok(userService.setPassword(authentication.getName(), newPasswordDto));
     }
 
     @GetMapping( "/me")
-    public ResponseEntity<UserDto> getUser() {
-        return ResponseEntity.ok(new UserDto());
-        //return ResponseEntity.ok(userService.getUserDto());
+    public ResponseEntity<UserDto> getUser(Authentication authentication) {
+        return ResponseEntity.ok(userService.getUserDto(authentication.getName()));
     }
 
     @PatchMapping("/me")
-    public ResponseEntity<UserDto> updateUser(@RequestBody UserDto userDto) {
-        return ResponseEntity.ok(userService.updateUser(userDto));
+    public ResponseEntity<UserDto> updateUser(Authentication authentication, @RequestBody UserDto body) {
+        return ResponseEntity.ok(userService.updateUser(authentication.getName(), body));
     }
 
-    @PatchMapping(path = "/me/{id}/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<UserDto> updateUserImage(@PathVariable int id, @RequestPart("MultipartFile") MultipartFile image) {
-        userService.updateUserImage(id, image);
+    @PatchMapping(path = "/me/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<UserDto> updateUserImage(Authentication authentication,
+                                                   @RequestPart("MultipartFile") MultipartFile image) {
+        userService.updateUserImage(authentication.getName(), image);
         return ResponseEntity.ok().build();
     }
-
 
 }
