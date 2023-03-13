@@ -25,14 +25,3 @@ public interface AdsMapper {
     @Mapping(target = "image", source = "image")//uses = ImageToString.class
     FullAdsDto adsToFullAdsDTO(Ads ads);
 }
-
-@Component
-class ImageToString {
-    String mapImageToString(Image image) {
-        if (image.getPathImage() == null || image.getId() == null) {
-            return null;
-        } else {
-            return "/ads/image/" + image.getId();
-        }
-    }
-}

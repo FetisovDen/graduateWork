@@ -20,9 +20,5 @@ public interface CommentMapper {
     @Mapping(target = "createdAt", source = "createdAt")
     Comment commentDtoToEntity(CommentDto commentDto);
 }
-@Component
-class CommentDtoToEntity {
-    Timestamp mapStringToTimestamp(String string) {
-        return Timestamp.valueOf(string);
-    }
-}
+
+

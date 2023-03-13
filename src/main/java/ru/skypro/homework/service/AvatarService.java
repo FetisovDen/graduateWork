@@ -17,10 +17,10 @@ import java.time.format.DateTimeFormatter;
 @Service
 public class AvatarService {
     private final AvatarRepository avatarRepository;
-    private final String avatarDir;
+    private final String avatarDir = "./images/avatar";
     private final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public AvatarService(@Value("./images/avatar") String avatarDir, AvatarRepository avatarRepository) {
+    public AvatarService(String avatarDir, AvatarRepository avatarRepository) {
         this.avatarRepository = avatarRepository;
         this.avatarDir = avatarDir;
     }
