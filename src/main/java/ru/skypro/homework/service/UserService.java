@@ -3,19 +3,13 @@ package ru.skypro.homework.service;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.NewPasswordDto;
-import ru.skypro.homework.dto.Role;
 import ru.skypro.homework.dto.UserDto;
 import ru.skypro.homework.entity.Avatar;
-import ru.skypro.homework.entity.Comment;
 import ru.skypro.homework.entity.User;
-import ru.skypro.homework.exception.CommentNotFoundException;
 import ru.skypro.homework.exception.PasswordMismatchException;
 import ru.skypro.homework.exception.UserNotFoundException;
 import ru.skypro.homework.mapper.UserMapper;
 import ru.skypro.homework.repository.UserRepository;
-import ru.skypro.homework.service.AvatarService;
-
-import java.time.LocalDateTime;
 
 @Service
 public class UserService {
@@ -47,6 +41,12 @@ public class UserService {
     }
     public UserDto getUserDto(String userName) {
         return userMapper.toDTO(getUser(userName));
+    }
+    public byte[] getUserAvatar(String userName) {
+        User user = userRepository.findByUserName(userName);
+        checkUser(user);
+        Avatar avatar = user.getAvatar();
+        return avatar.getBytes();
     }
     public UserDto updateUser(String userName, UserDto body) {
         User oldUser = getUser(userName);

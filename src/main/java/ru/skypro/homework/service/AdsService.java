@@ -7,13 +7,17 @@ import ru.skypro.homework.entity.Ads;
 import ru.skypro.homework.entity.Avatar;
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.exception.AdsNotFoundException;
+import ru.skypro.homework.exception.RequestDeniedException;
 import ru.skypro.homework.mapper.AdsMapper;
 import ru.skypro.homework.mapper.UserMapper;
 import ru.skypro.homework.repository.AdsRepository;
+import ru.skypro.homework.repository.UserRepository;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class AdsService {
@@ -23,14 +27,18 @@ public class AdsService {
     private final UserMapper userMapper;
     private final ImageService imageService;
     private final UserService userService;
+    private final UserRepository userRepository;
 
-    public AdsService(AdsRepository adsRepository, CommentService commentService, AdsMapper adsMapper, UserMapper userMapper, ImageService imageService, UserService userService) {
+    public AdsService(AdsRepository adsRepository, CommentService commentService, AdsMapper adsMapper,
+                      UserMapper userMapper, ImageService imageService, UserService userService,
+                      UserRepository userRepository) {
         this.adsRepository = adsRepository;
         this.commentService = commentService;
         this.adsMapper = adsMapper;
         this.userMapper = userMapper;
         this.imageService = imageService;
         this.userService = userService;
+        this.userRepository = userRepository;
     }
 
 
@@ -76,14 +84,18 @@ public class AdsService {
         return adsMapper.adsToFullAdsDTO(ads);
     }
 
-    public FullAdsDto deleteAds(int id) {
+    public FullAdsDto deleteAds(String username, int id) {
+        User user = userRepository.findByUserName(username);
         Ads ads = adsRepository.findById(id).orElseThrow(AdsNotFoundException::new);
+        if(!ads.getUser().equals(user)) {throw new RequestDeniedException();}
         adsRepository.deleteById(id);
         return adsMapper.adsToFullAdsDTO(ads);
     }
 
-    public AdsDto updateAds(int id, CreateAdsDto createAdsDto) {
+    public AdsDto updateAds(String username, int id, CreateAdsDto createAdsDto) {
+        User user = userRepository.findByUserName(username);
         Ads ads = adsRepository.findById(id).orElseThrow(AdsNotFoundException::new);
+        if(!ads.getUser().equals(user)) {throw new RequestDeniedException();}
         ads.setDescription(createAdsDto.getDescription());
         ads.setPrice(createAdsDto.getPrice());
         ads.setTitle(createAdsDto.getTitle());
@@ -96,13 +108,17 @@ public class AdsService {
         return commentService.getCommentOfAds(ads, id);
     }
 
-    public CommentDto deleteCommentOfAds(int adPk, int id) {
+    public CommentDto deleteCommentOfAds(String username, int adPk, int id) {
+        User user = userRepository.findByUserName(username);
         Ads ads = adsRepository.findById(adPk).orElseThrow(AdsNotFoundException::new);
+        if(!ads.getUser().equals(user)) {throw new RequestDeniedException();}
         return commentService.deleteCommentOfAds(ads, id);
     }
 
-    public CommentDto updateComments(int adPk, int id, CommentDto commentDto) {
+    public CommentDto updateComments(String username, int adPk, int id, CommentDto commentDto) {
+        User user = userRepository.findByUserName(username);
         Ads ads = adsRepository.findById(adPk).orElseThrow(AdsNotFoundException::new);
+        if(!ads.getUser().equals(user)) {throw new RequestDeniedException();}
         return commentService.updateComments(ads, id, commentDto);
     }
 

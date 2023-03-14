@@ -36,6 +36,14 @@ public class UserController {
     public ResponseEntity<UserDto> getUser(Authentication authentication) {
         return ResponseEntity.ok(userService.getUserDto(authentication.getName()));
     }
+    @GetMapping(value =  "/me/image", produces = {MediaType.IMAGE_JPEG_VALUE})
+    public ResponseEntity<byte[]> getUserAvatar(Authentication authentication) {
+        byte[] img = userService.getUserAvatar(authentication.getName());
+        return ResponseEntity.ok()
+                .contentLength(img.length)
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(img);
+    }
 
     @PatchMapping("/me")
     public ResponseEntity<UserDto> updateUser(Authentication authentication, @RequestBody UserDto body) {

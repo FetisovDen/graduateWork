@@ -51,14 +51,14 @@ public class AdsController {
 
     @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<FullAdsDto> deleteAds(@PathVariable int id) {
-        return ResponseEntity.ok(adsService.deleteAds(id));
+    public ResponseEntity<FullAdsDto> deleteAds(Authentication au, @PathVariable int id) {
+        return ResponseEntity.ok(adsService.deleteAds(au.getName(), id));
     }
 
     @PreAuthorize("hasRole('USER')")
     @PatchMapping("/{id}")
-    public ResponseEntity<AdsDto> updateAds(@PathVariable int id, @RequestBody CreateAdsDto createAdsDto) {
-        return ResponseEntity.ok(adsService.updateAds(id, createAdsDto));
+    public ResponseEntity<AdsDto> updateAds(Authentication au, @PathVariable int id, @RequestBody CreateAdsDto createAdsDto) {
+        return ResponseEntity.ok(adsService.updateAds(au.getName(), id, createAdsDto));
     }
 
     @PreAuthorize("hasRole('USER')")
@@ -69,16 +69,17 @@ public class AdsController {
 
     @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/{ad_pk}/comments/{id}")
-    public ResponseEntity<CommentDto> deleteComments(@PathVariable("ad_pk") int adPk, @PathVariable int id) {
+    public ResponseEntity<CommentDto> deleteComments(Authentication au, @PathVariable("ad_pk") int adPk,
+                                                     @PathVariable int id) {
 //        add BadRequest
-        return ResponseEntity.ok(adsService.deleteCommentOfAds(adPk, id));
+        return ResponseEntity.ok(adsService.deleteCommentOfAds(au.getName(), adPk, id));
     }
 
     @PreAuthorize("hasRole('USER')")
     @PatchMapping("/{ad_pk}/comments/{id}")
-    public ResponseEntity<CommentDto> updateComments(@PathVariable("ad_pk") int adPk, @PathVariable int id,
-                                                     @RequestBody CommentDto commentDto) {
-        return ResponseEntity.ok(adsService.updateComments(adPk, id, commentDto));
+    public ResponseEntity<CommentDto> updateComments(Authentication au, @PathVariable("ad_pk") int adPk,
+                                                     @PathVariable int id, @RequestBody CommentDto commentDto) {
+        return ResponseEntity.ok(adsService.updateComments(au.getName(), adPk, id, commentDto));
     }
 
     @PreAuthorize("hasRole('USER')")
